@@ -1,0 +1,29 @@
+<div class="container">
+  <div>
+    <h1 appTitles>Categorias</h1>
+    <p> Los siguientes son las categorias actuales </p>
+  </div>
+
+  <div class="sub-container">
+    <div class="button-container">
+      <button (click)="onCreateCategory()" mat-flat-button color="primary" type="button">
+        <mat-icon>add</mat-icon>
+        Crear Categoria
+      </button>
+    </div>
+
+    <app-categories-table
+      class="table"
+      [dataSource]="(categories | async) || []"
+      (deleteCategory)="onDeleteCategory($event)"
+      (editCategory)="onEditCategory($event)">
+    </app-categories-table>
+  </div>
+</div>
+
+
+
+
+
+
+

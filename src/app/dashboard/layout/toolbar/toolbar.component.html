@@ -1,0 +1,13 @@
+<mat-toolbar class="container">
+  <div class="sub-container">
+    <button (click)="drawer?.toggle()"  mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div class="logo"></div>
+  </div>
+
+
+  <p class="user" *ngIf="authUser$ | async; let authUser ">
+    {{ authUser?.name }} {{ authUser?.lastName }}
+  </p>
+</mat-toolbar>

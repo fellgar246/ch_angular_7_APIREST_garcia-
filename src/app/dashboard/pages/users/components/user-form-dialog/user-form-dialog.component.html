@@ -1,0 +1,57 @@
+<h1 mat-dialog-title>
+  {{
+    editingUser
+      ? "Editando a" + editingUser.name + " " + editingUser.lastName
+      : "Creando usuario"
+  }}
+</h1>
+<div mat-dialog-content>
+  <form [formGroup]="userForm" >
+    <div class="formInputs">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input formControlName="name" matInput type="text" name="name" />
+        <mat-error *ngFor="let error of nameControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>LastName</mat-label>
+        <input formControlName="lastName" matInput type="text" name="lastname" />
+        <mat-error *ngFor="let error of lastNameControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input formControlName="email" matInput type="email" name="email" />
+        <mat-error *ngFor="let error of emailControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Curso</mat-label>
+        <mat-select formControlName="course">
+          <mat-option value="Angular">Angular</mat-option>
+          <mat-option value="React">React</mat-option>
+          <mat-option value="React">WordPress</mat-option>
+        </mat-select>
+        <mat-error *ngFor="let error of courseControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Edad</mat-label>
+        <input formControlName="age" matInput type="number" name="age" />
+        <mat-error *ngFor="let error of ageControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button (click)="onSubmit()" type="submit" mat-button>Guardar</button>
+</div>
+

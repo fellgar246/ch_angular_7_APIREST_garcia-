@@ -1,0 +1,24 @@
+<div class="container">
+
+  <div>
+    <h1 appTitles>Alumnos</h1>
+    <p> Los siguientes son tus alumnos actuales </p>
+  </div>
+
+  <div class="sub-container">
+    <div class="button-container">
+      <button (click)="onCreateUser()" mat-flat-button color="primary" type="button">
+        <mat-icon>add</mat-icon>
+        Agregar Alumno
+      </button>
+    </div>
+
+    <app-users-table
+      class="table"
+      [dataSource]="(users | async) || []"
+      (deleteUser)="onDeleteUser($event)"
+      (editUser)="onEditUser($event)">
+    </app-users-table>
+  </div>
+
+</div>

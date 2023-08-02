@@ -1,0 +1,32 @@
+<h1 mat-dialog-title>
+  {{
+    editingCategory
+      ? "Editando a " + editingCategory.name + " "
+      : "Creando categoria"
+  }}
+</h1>
+<div mat-dialog-content>
+  <form [formGroup]="categoryForm" >
+    <div class="formInputs">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre de Categoría</mat-label>
+        <input formControlName="name" matInput type="text" name="name" />
+        <mat-error *ngFor="let error of nameControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Descripción</mat-label>
+        <input formControlName="description" matInput type="text" name="description" />
+        <mat-error *ngFor="let error of descriptionControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button (click)="onSubmit()" type="submit" mat-button>Guardar</button>
+</div>
+

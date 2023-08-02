@@ -1,0 +1,24 @@
+
+.container{
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 30px;
+}
+
+.sub-container{
+  display: flex;
+  flex-direction: column;
+  row-gap: 30px;
+  align-items: center;
+
+}
+
+.button-container{
+  display: flex;
+  width: 100%;
+}
+
+.table{
+  width: 100%;
+}

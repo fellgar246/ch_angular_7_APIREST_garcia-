@@ -1,0 +1,36 @@
+<h1 mat-dialog-title>
+  {{
+    editingCourse
+      ? "Editando a" + editingCourse.nameCourse
+      : "Creando Curso"
+  }}
+</h1>
+<div mat-dialog-content>
+  <form [formGroup]="courseForm" >
+    <div class="formInputs">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre de Curso</mat-label>
+        <input formControlName="nameCourse" matInput type="text" name="nameCourse" />
+        <mat-error *ngFor="let error of nameCourseControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de Curso</mat-label>
+        <mat-select formControlName="typeCourse">
+          <mat-option value="Frontend">Frontend</mat-option>
+          <mat-option value="Backend">Backend</mat-option>
+          <mat-option value="Bases de datos">Bases de Datos</mat-option>
+        </mat-select>
+        <mat-error *ngFor="let error of typeCourseControl.errors | keyvalue">
+          {{ error | controlErrorMessage }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button (click)="onSubmit()" type="submit" mat-button>Guardar</button>
+</div>
+
