@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "name": "User",
+      "lastName": "Prueba",
+      "email": "prueba@mail.com",
+      "age": 18,
+      "course": "Angular",
+      "id": 1,
+      "password": "1234"
+    },
+    {
+      "id": 2,
+      "name": "Maria",
+      "lastName": "Gomez",
+      "email": "maria@email.com",
+      "age": 30,
+      "course": "React",
+      "password": "1234"
+    },
+    {
+      "id": 3,
+      "name": "Juan",
+      "lastName": "Perez",
+      "email": "juan@mail.com",
+      "age": 25,
+      "course": "Angular",
+      "password": "1234"
+    }
+  ],
+  "products": []
+}

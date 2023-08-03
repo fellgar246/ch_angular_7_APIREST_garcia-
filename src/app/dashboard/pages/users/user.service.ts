@@ -1,27 +1,9 @@
 import { Injectable } from '@angular/core';
 import { CreateUserData, UpdateUserData, User } from './models';
-import { BehaviorSubject, Observable, Subject, delay, of, take, map } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, delay, of, take, map, mergeMap } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NotifierService } from 'src/app/core/services/notifier.service';
 
-const USER_DB: Observable<User[]> = of([
-  {
-    id: 1,
-    name: 'Juan',
-    lastName: 'Perez',
-    email: 'juan@mail.com',
-    age: 25,
-    course: 'Angular',
-    password: '1234'
-  },
-  {
-    id: 2,
-    name: 'Maria',
-    lastName: 'Gomez',
-    email: 'maria@email.com',
-    age: 30,
-    course: 'React',
-    password: '1234'
-  },
-]).pipe(delay(500));
 
 @Injectable({
   providedIn: 'root'
@@ -31,11 +13,31 @@ export class UserService {
   private _users$ = new BehaviorSubject<User[]>([]);
   private users$ = this._users$.asObservable();
 
-  constructor() {}
+  private _isLoading$ = new BehaviorSubject(false);
+  public isLoading$ = this._isLoading$.asObservable();
+
+  constructor(private notifier: NotifierService,private httpClient: HttpClient) {}
 
   loadUsers(): void {
-    USER_DB.subscribe({
-      next: (usuariosFromDb) => this._users$.next(usuariosFromDb)
+    this._isLoading$.next(true);
+    this.httpClient.get<User[]>('http://localhost:3000/users', {
+      headers: new HttpHeaders({
+        'token': '123456'
+      }),
+      params: {
+        page: 1
+      }
+    }).subscribe({
+      next: (response) => {
+        this._users$.next(response)
+
+      },
+      error: () => {
+        this.notifier.showError('Error','Error al cargar los usuarios')
+      },
+      complete: () => {
+        this._isLoading$.next(false);
+      }
     })
   }
 
@@ -51,33 +53,45 @@ export class UserService {
   }
 
   createUser(user: CreateUserData): void {
-    this.users$.pipe(take(1)).subscribe({
-      next: (arrayActual) => {
-        this._users$.next([
-          ...arrayActual,
-          {...user, id: arrayActual.length + 1}
-        ])
-      }
+    this.httpClient.post<User>('http://localhost:3000/users', user)
+      .pipe(
+        mergeMap((userCreated)=> this.users$.pipe(
+          take(1),
+          map(
+            (arrayActual) => ([...arrayActual, userCreated])
+          )
+          )
+        ),
+      )
+      .subscribe({
+        next: (arrayActualizado) => {
+          this._users$.next(arrayActualizado);
+        }
     })
   }
 
   updateUserById(id: Number, usuarioActualizado: UpdateUserData): void {
-    this.users$.pipe(take(1)).subscribe({
-      next: (arrayActual) => {
-        this._users$.next(
-          arrayActual.map((user) =>
-            user.id === id ? { ...user, ...usuarioActualizado } : user
-          )
-        )
-      }
+    this.httpClient.put<User>(`http://localhost:3000/users/${id}`, usuarioActualizado).subscribe({
+      next: ()=> this.loadUsers(),
     })
   }
 
+
   deleteUserById(id: Number): void {
-    this._users$.pipe(take(1)).subscribe({
-      next: (arrayActual) =>
-        this._users$.next(arrayActual.filter((user) => user.id !== id))
-    })
+    this.httpClient.delete(`http://localhost:3000/users/${id}`)
+      .pipe(
+        mergeMap(
+          (responseUserDeleted) => this.users$.pipe(
+            take(1),
+            map((arrayActual) => arrayActual.filter((user) => user.id !== id))
+          )
+        )
+      ).subscribe({
+        next: (arrayActualizado) => {
+          this._users$.next(arrayActualizado);
+        }
+      })
   }
+
 
 }

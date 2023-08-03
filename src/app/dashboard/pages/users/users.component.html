@@ -13,12 +13,17 @@
       </button>
     </div>
 
-    <app-users-table
-      class="table"
-      [dataSource]="(users | async) || []"
-      (deleteUser)="onDeleteUser($event)"
-      (editUser)="onEditUser($event)">
-    </app-users-table>
+    <div *ngIf="isLoading$ | async; else notLoadingTemplate">Está cargando</div>
+
+    <ng-template #notLoadingTemplate>
+      <app-users-table
+        class="table"
+        [dataSource]="(users | async) || []"
+        (deleteUser)="onDeleteUser($event)"
+        (editUser)="onEditUser($event)">
+      </app-users-table>
+    </ng-template>
+
   </div>
 
 </div>

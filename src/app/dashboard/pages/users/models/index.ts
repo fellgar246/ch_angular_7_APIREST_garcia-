@@ -23,4 +23,5 @@ export interface UpdateUserData {
   age?: Number;
   email?: String;
   course?: String;
+  password?: String;
 }
