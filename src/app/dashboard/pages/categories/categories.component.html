@@ -12,12 +12,17 @@
       </button>
     </div>
 
-    <app-categories-table
-      class="table"
-      [dataSource]="(categories | async) || []"
-      (deleteCategory)="onDeleteCategory($event)"
-      (editCategory)="onEditCategory($event)">
-    </app-categories-table>
+    <div *ngIf="isLoading$ | async; else notLoadingTemplate">Está cargando</div>
+
+    <ng-template #notLoadingTemplate>
+      <app-categories-table
+        class="table"
+        [dataSource]="(categories | async) || []"
+        (deleteCategory)="onDeleteCategory($event)"
+        (editCategory)="onEditCategory($event)">
+      </app-categories-table>
+    </ng-template>
+
   </div>
 </div>
 

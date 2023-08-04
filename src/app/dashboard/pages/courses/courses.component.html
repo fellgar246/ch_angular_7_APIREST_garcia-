@@ -13,12 +13,16 @@
       </button>
     </div>
 
-    <app-courses-table
+    <div *ngIf="isLoading$ | async; else notLoadingTemplate">Está cargando</div>
+
+    <ng-template #notLoadingTemplate>
+      <app-courses-table
       class="table"
       [dataSource]="(courses | async) || []"
       (deleteCourse)="onDeleteCourse($event)"
       (editCourse)="onEditCourse($event)">
     </app-courses-table>
+    </ng-template>
   </div>
 
 </div>

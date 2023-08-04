@@ -13,6 +13,7 @@ import { NotifierService } from '../../../core/services/notifier.service';
 })
 export class CategoriesComponent {
   public categories: Observable<Category[]>;
+  public isLoading$: Observable<boolean>;
 
   constructor(
     private matDialog: MatDialog,
@@ -20,6 +21,7 @@ export class CategoriesComponent {
     private notifier: NotifierService,
     ) {
     this.categoryService.loadCategories();
+    this.isLoading$ = this.categoryService.isLoading$;
     this.categories = this.categoryService.getCategories();
   }
 

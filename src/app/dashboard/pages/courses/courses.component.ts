@@ -13,6 +13,7 @@ import { Observable, map } from 'rxjs';
 })
 export class CoursesComponent {
   public courses: Observable<Course[]>;
+  public isLoading$: Observable<boolean>;
 
   constructor(
     private matDialog: MatDialog,
@@ -20,6 +21,7 @@ export class CoursesComponent {
     private notifier: NotifierService,
     ) {
       this.courseService.loadCourses();
+      this.isLoading$ = this.courseService.isLoading$;
       this.courses = this.courseService.getCourses()
     }
 

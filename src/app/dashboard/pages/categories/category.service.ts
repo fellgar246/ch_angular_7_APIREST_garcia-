@@ -1,24 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, take, of, map } from 'rxjs';
+import { BehaviorSubject, Subject, take, map, mergeMap } from 'rxjs';
 import { Category, UpdateCategoryData } from './models';
-
-const CATEGORY_DB: Observable<Category[]> = of([
-  {
-    id: 1,
-    name: 'Frontend',
-    description: 'lorem ipsum',
-  },
-  {
-    id: 2,
-    name: 'Backend',
-    description: 'lorem ipsum',
-  },
-  {
-    id: 3,
-    name: 'Bases de Datos',
-    description: 'lorem ipsum',
-  },
-])
+import { NotifierService } from 'src/app/core/services/notifier.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -28,49 +13,72 @@ export class CategoryService {
   private _categories$ = new BehaviorSubject<Category[]>([]);
   private categories$ = this._categories$.asObservable();
 
-  constructor() { }
+  private _isLoading$ = new BehaviorSubject(false);
+  public isLoading$ = this._isLoading$.asObservable();
+
+  constructor(private notifier: NotifierService,private httpClient: HttpClient) { }
+
+  loadCategories(): void {
+    this._isLoading$.next(true);
+    this.httpClient.get<Category[]>(environment.baseApiUrl + '/categories').subscribe({
+      next: (response) => {
+        this._categories$.next(response)
+
+      },
+      error: () => {
+        this.notifier.showError('Error','Error al cargar las categorias')
+      },
+      complete: () => {
+        this._isLoading$.next(false);
+      }
+    })
+  }
+
 
   getCategories(): Subject<Category[]> {
     return this._categories$
   }
 
-  loadCategories(): void {
-    CATEGORY_DB.subscribe({
-      next: (categoriesFromDb) => this._categories$.next(categoriesFromDb)
-    })
-  }
+
 
   createCategories(category: Category):void {
-    this.categories$.pipe(take(1)).subscribe({
-      next: (arrayActual) => {
-        this._categories$.next([
-          ...arrayActual,
-          {...category, id: arrayActual.length + 1}
-        ]);
+    this.httpClient.post<Category>(environment.baseApiUrl + '/categories', {...category})
+    .pipe(
+      mergeMap((categoryCreated)=> this.categories$.pipe(
+        take(1),
+        map(
+          (arrayActual) => ([...arrayActual, categoryCreated])
+        )
+        )
+      ),
+    )
+    .subscribe({
+      next: (arrayActualizado) => {
+        this._categories$.next(arrayActualizado);
       }
     })
   }
 
   updateCategoryById(id: Number, categoryUpdated:UpdateCategoryData ): void {
-    this.categories$.pipe(take(1)).subscribe({
-      next: (arrayActual) => {
-        this._categories$.next(
-          arrayActual.map((category) =>
-            category.id === id ? { ...category, ...categoryUpdated } : category
-            )
-        )
-      }
+    this.httpClient.put<Category>(environment.baseApiUrl + `/categories/${id}`, categoryUpdated).subscribe({
+      next: ()=> this.loadCategories(),
     })
   }
 
   deleteCategoryById(id: Number): void {
-    this.categories$.pipe(take(1)).subscribe({
-      next: (arrayActual) => {
-        this._categories$.next(
-          arrayActual.filter(category => category.id !== id)
-        );
-      }
-    })
+    this.httpClient.delete(environment.baseApiUrl + `/categories/${id}`)
+      .pipe(
+        mergeMap(
+          (responseCategoryDeleted) => this.categories$.pipe(
+            take(1),
+            map((arrayActual) => arrayActual.filter((category) => category.id !== id))
+          )
+        )
+      ).subscribe({
+        next: (arrayActualizado) => {
+          this._categories$.next(arrayActualizado);
+        }
+      })
   }
 }
 

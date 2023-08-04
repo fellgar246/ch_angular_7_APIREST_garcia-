@@ -1,29 +1,9 @@
 import { Injectable } from '@angular/core';
 import { CreateCourseData, UpdateCourseData, Course } from './models';
-import { BehaviorSubject, Observable, Subject, delay, of, take } from 'rxjs';
-
-const COURSE_DB: Observable<Course[]> = of([
-  {
-    id: 1,
-    nameCourse: "Angular",
-    typeCourse: "Frontend",
-  },
-  {
-    id: 2,
-    nameCourse: "React",
-    typeCourse: "Frontend",
-  },
-  {
-    id: 3,
-    nameCourse: "Mongo",
-    typeCourse: "Backend",
-  },
-  {
-    id: 4,
-    nameCourse: "SQL",
-    typeCourse: "Bases de Datos",
-  },
-]).pipe(delay(500));
+import { BehaviorSubject, Observable, Subject, delay, of, take, mergeMap, map } from 'rxjs';
+import { NotifierService } from 'src/app/core/services/notifier.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -33,11 +13,24 @@ export class CourseService {
   private _course$ = new BehaviorSubject<Course[]>([]);
   private course$ = this._course$.asObservable();
 
-  constructor() {}
+  private _isLoading$ = new BehaviorSubject(false);
+  public isLoading$ = this._isLoading$.asObservable();
+
+  constructor(private notifier: NotifierService,private httpClient: HttpClient) {}
 
   loadCourses(): void {
-    COURSE_DB.subscribe({
-      next: (courseFromDb: Course[]) => this._course$.next(courseFromDb)
+    this._isLoading$.next(true);
+    this.httpClient.get<Course[]>(environment.baseApiUrl + '/courses').subscribe({
+      next: (response) => {
+        this._course$.next(response)
+
+      },
+      error: () => {
+        this.notifier.showError('Error','Error al cargar los cursos')
+      },
+      complete: () => {
+        this._isLoading$.next(false);
+      }
     })
   }
 
@@ -46,33 +39,42 @@ export class CourseService {
   }
 
   createCourse(course: CreateCourseData): void {
-    this.course$.pipe(take(1)).subscribe({
-      next: (arrayActual) => {
-        this._course$.next([
-          ...arrayActual,
-          {...course, id: arrayActual.length + 1}
-        ])
-      }
+    this.httpClient.post<Course>(environment.baseApiUrl + '/courses', {...course })
+      .pipe(
+        mergeMap((courseCreated)=> this.course$.pipe(
+          take(1),
+          map(
+            (arrayActual) => ([...arrayActual, courseCreated])
+          )
+          )
+        ),
+      )
+      .subscribe({
+        next: (arrayActualizado) => {
+          this._course$.next(arrayActualizado);
+        }
     })
   }
 
   updateCourseById(id: Number, courseActualizado: UpdateCourseData): void {
-    this.course$.pipe(take(1)).subscribe({
-      next: (arrayActual) => {
-        this._course$.next(
-          arrayActual.map((course) =>
-            course.id === id ? { ...course, ...courseActualizado } : course
-          )
-        )
-      }
+    this.httpClient.put<Course>(environment.baseApiUrl + `/courses/${id}`, courseActualizado).subscribe({
+      next: ()=> this.loadCourses(),
     })
   }
 
   deleteCourseById(id: Number): void {
-    this._course$.pipe(take(1)).subscribe({
-      next: (arrayActual) =>
-        this._course$.next(arrayActual.filter((course) => course.id !== id))
+    this.httpClient.delete(environment.baseApiUrl + `/courses/${id}`)
+    .pipe(
+      mergeMap(
+        (responseCourseDeleted) => this.course$.pipe(
+          take(1),
+          map((arrayActual) => arrayActual.filter((course) => course.id !== id))
+        )
+      )
+    ).subscribe({
+      next: (arrayActualizado) => {
+        this._course$.next(arrayActualizado);
+      }
     })
   }
-
 }

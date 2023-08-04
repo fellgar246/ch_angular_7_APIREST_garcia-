@@ -7,7 +7,8 @@
       "age": 18,
       "course": "Angular",
       "id": 1,
-      "password": "1234"
+      "password": "1234",
+      "token": "ddkfsdopkodpskps"
     },
     {
       "id": 2,
@@ -16,7 +17,8 @@
       "email": "maria@email.com",
       "age": 30,
       "course": "React",
-      "password": "1234"
+      "password": "1234",
+      "token": "ddkfsdopkodpskps"
     },
     {
       "id": 3,
@@ -25,8 +27,47 @@
       "email": "juan@mail.com",
       "age": 25,
       "course": "Angular",
-      "password": "1234"
+      "password": "1234",
+      "token": "ddkfsdopkodpskps"
     }
   ],
-  "products": []
+  "courses": [
+    {
+      "nameCourse": "Angular",
+      "typeCourse": "Frontend",
+      "id": 1
+    },
+    {
+      "id": 2,
+      "nameCourse": "React",
+      "typeCourse": "Frontend"
+    },
+    {
+      "id": 3,
+      "nameCourse": "Mongo",
+      "typeCourse": "Backend"
+    },
+    {
+      "id": 4,
+      "nameCourse": "SQL",
+      "typeCourse": "Bases de Datos"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Fronten",
+      "description": "lorem ipsum",
+      "id": 1
+    },
+    {
+      "id": 2,
+      "name": "Backend",
+      "description": "lorem ipsum"
+    },
+    {
+      "id": 3,
+      "name": "Bases de Datos",
+      "description": "lorem ipsum"
+    }
+  ]
 }

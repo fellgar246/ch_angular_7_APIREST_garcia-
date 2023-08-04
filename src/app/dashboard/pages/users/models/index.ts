@@ -6,6 +6,7 @@ export interface User {
   email: String;
   course: String;
   password: String;
+  token: string;
 }
 
 export interface CreateUserData {
